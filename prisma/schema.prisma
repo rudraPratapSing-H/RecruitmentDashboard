@@ -126,7 +126,6 @@ model interview_scores {
   candidateEmail     String   @db.VarChar(255)
   contactNumber      String?  @db.VarChar(20)
   vertical           String?  @db.VarChar(100)
-  score              Int      @db.TinyInt
   interviewer        String   @db.VarChar(255)
   feedback           String?  @db.Text
   createdAt          DateTime @default(now())

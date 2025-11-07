@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 
 
+
+
 import { useRouter } from 'next/navigation';
 
 export default function AdminPage() {
@@ -144,21 +146,26 @@ export default function AdminPage() {
           const candidate = grouped[email];
           candidate.totalScores = candidate.scores.length;
           
-          const scoreTypes = ['confidence', 'dressing_sense', 'dedication', 'experience', 'preferred_vertical', 'priority'];
-          scoreTypes.forEach(type => {
-            const validScores = candidate.scores.filter(s => s[type] !== null && s[type] !== undefined);
+          // Only numeric score types (1-5 stars) - excluding preferred_vertical which is now text
+          const numericScoreTypes = ['confidence', 'dressing_sense', 'dedication', 'experience', 'priority'];
+          const statistics = { averageScores: {} };
+          
+          numericScoreTypes.forEach(type => {
+            const validScores = candidate.scores.filter(s => s[type] !== null && s[type] !== undefined && s[type] > 0);
             if (validScores.length > 0) {
-              candidate.averageScores[type] = (
+              statistics.averageScores[type] = (
                 validScores.reduce((sum, s) => sum + s[type], 0) / validScores.length
               ).toFixed(2);
             } else {
-              candidate.averageScores[type] = 'N/A';
+              statistics.averageScores[type] = null;
             }
           });
           
-          // Calculate overall average score
-          const allAverages = Object.values(candidate.averageScores).filter(v => v !== 'N/A').map(v => parseFloat(v));
-          candidate.averageScore = allAverages.length > 0 ? (allAverages.reduce((a, b) => a + b, 0) / allAverages.length).toFixed(2) : 0;
+          // Calculate overall average score (average of the 5 numeric star ratings)
+          const allAverages = Object.values(statistics.averageScores).filter(v => v !== null).map(v => parseFloat(v));
+          statistics.averageScore = allAverages.length > 0 ? (allAverages.reduce((a, b) => a + b, 0) / allAverages.length).toFixed(2) : 0;
+          
+          candidate.statistics = statistics;
         });
 
         setCandidates(Object.values(grouped));
@@ -523,13 +530,13 @@ export default function AdminPage() {
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                           <span style={{ 
                             padding: '6px 12px',
-                            backgroundColor: getScoreColor(candidate.averageScore),
+                            backgroundColor: getScoreColor(candidate.statistics?.averageScore || 0),
                             color: 'white',
                             borderRadius: '6px',
                             fontWeight: '600',
                             fontSize: '14px'
                           }}>
-                            {candidate.averageScore}/10
+                            {candidate.statistics?.averageScore || 0}/5
                           </span>
                           <span style={{ fontSize: '13px', color: '#6b7280' }}>
                             {candidate.totalScores} interview{candidate.totalScores !== 1 ? 's' : ''}
@@ -590,7 +597,7 @@ export default function AdminPage() {
                       <div style={{ fontSize: '36px', fontWeight: '700', color: getScoreColor(candidateSummary.statistics.averageScore), marginBottom: '4px' }}>
                         {candidateSummary.statistics.averageScore}
                       </div>
-                      <div style={{ fontSize: '12px', color: '#94a3b8', fontWeight: '500' }}>Overall Average</div>
+                      <div style={{ fontSize: '12px', color: '#94a3b8', fontWeight: '500' }}>Average of 5 Stars</div>
                       <div style={{ fontSize: '11px', color: '#64748b', marginTop: '4px' }}>
                         {getScoreLabel(candidateSummary.statistics.averageScore)}
                       </div>
@@ -613,7 +620,7 @@ export default function AdminPage() {
                   {/* Individual Score Averages */}
                   {candidateSummary.statistics.averageScores && (
                     <div style={{ marginBottom: '20px' }}>
-                      <h3 style={{ fontSize: '16px', color: '#cbd5e1', marginBottom: '12px', fontWeight: '600' }}>📊 Score Breakdown</h3>
+                      <h3 style={{ fontSize: '16px', color: '#cbd5e1', marginBottom: '12px', fontWeight: '600' }}>📊 Score Breakdown (Average of 5 Stars)</h3>
                       <div style={{ 
                         display: 'grid', 
                         gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', 
@@ -636,6 +643,42 @@ export default function AdminPage() {
                               </div>
                             </div>
                           )
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Preferred Verticals */}
+                  {candidateSummary.statistics.preferredVerticals && candidateSummary.statistics.preferredVerticals.length > 0 && (
+                    <div style={{ marginBottom: '20px' }}>
+                      <h3 style={{ fontSize: '16px', color: '#cbd5e1', marginBottom: '12px', fontWeight: '600' }}>🎯 Preferred Verticals</h3>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {candidateSummary.statistics.preferredVerticals.map((item, index) => (
+                          <div key={index} style={{ 
+                            padding: '12px 16px',
+                            backgroundColor: '#1e293b',
+                            borderRadius: '6px',
+                            border: '1px solid #475569',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                          }}>
+                            <div>
+                              <div style={{ fontSize: '14px', fontWeight: '600', color: '#60a5fa', marginBottom: '4px' }}>
+                                {item.vertical}
+                              </div>
+                              <div style={{ fontSize: '12px', color: '#94a3b8' }}>
+                                By {item.interviewer}
+                              </div>
+                            </div>
+                            <div style={{ fontSize: '11px', color: '#64748b' }}>
+                              {new Date(item.createdAt).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric'
+                              })}
+                            </div>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -696,7 +739,7 @@ export default function AdminPage() {
                             gap: '8px',
                             flexWrap: 'wrap'
                           }}>
-                            {['confidence', 'dressing_sense', 'dedication', 'experience', 'preferred_vertical', 'priority'].map(type => (
+                            {['confidence', 'dressing_sense', 'dedication', 'experience', 'priority'].map(type => (
                               score[type] !== null && score[type] !== undefined && (
                                 <div key={type} style={{ 
                                   padding: '6px 12px',
@@ -714,6 +757,22 @@ export default function AdminPage() {
                                 </div>
                               )
                             ))}
+                            {score.preferred_vertical && score.preferred_vertical.trim() !== '' && (
+                              <div style={{ 
+                                padding: '6px 12px',
+                                backgroundColor: '#3b82f6',
+                                color: 'white',
+                                borderRadius: '6px',
+                                fontWeight: '600',
+                                fontSize: '13px',
+                                textAlign: 'center'
+                              }}>
+                                <div style={{ fontSize: '14px', fontWeight: '700' }}>{score.preferred_vertical}</div>
+                                <div style={{ fontSize: '9px', opacity: 0.9, textTransform: 'uppercase' }}>
+                                  Preferred Vertical
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                         

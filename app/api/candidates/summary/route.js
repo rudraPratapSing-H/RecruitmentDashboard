@@ -39,13 +39,16 @@ export async function GET(request) {
 
     // Calculate statistics for each score type
     const totalScores = scores.length;
-    const scoreTypes = ['confidence', 'dressing_sense', 'dedication', 'experience', 'preferred_vertical', 'priority'];
+    
+    // Numeric score types (1-5 stars)
+    const numericScoreTypes = ['confidence', 'dressing_sense', 'dedication', 'experience', 'priority'];
     const averages = {};
     const maxScores = {};
     const minScores = {};
     
-    scoreTypes.forEach(type => {
-      const validScores = scores.filter(s => s[type] !== null && s[type] !== undefined).map(s => s[type]);
+    // Calculate stats for numeric scores only
+    numericScoreTypes.forEach(type => {
+      const validScores = scores.filter(s => s[type] !== null && s[type] !== undefined && s[type] > 0).map(s => s[type]);
       if (validScores.length > 0) {
         averages[type] = (validScores.reduce((sum, s) => sum + s, 0) / validScores.length).toFixed(2);
         maxScores[type] = Math.max(...validScores);
@@ -57,9 +60,18 @@ export async function GET(request) {
       }
     });
     
-    // Calculate overall average
+    // Calculate overall average (average of all 5 star ratings)
     const allAverages = Object.values(averages).filter(v => v !== null).map(v => parseFloat(v));
     const overallAverage = allAverages.length > 0 ? (allAverages.reduce((a, b) => a + b, 0) / allAverages.length).toFixed(2) : 0;
+    
+    // Collect all preferred vertical values (text field)
+    const preferredVerticals = scores
+      .filter(s => s.preferred_vertical && s.preferred_vertical.trim() !== '')
+      .map(s => ({
+        vertical: s.preferred_vertical,
+        interviewer: s.interviewer,
+        createdAt: s.createdAt
+      }));
 
     return NextResponse.json({
       success: true,
@@ -74,7 +86,8 @@ export async function GET(request) {
         averageScore: parseFloat(overallAverage),
         averageScores: averages,
         maxScores,
-        minScores
+        minScores,
+        preferredVerticals: preferredVerticals
       },
       scores: scores
     });

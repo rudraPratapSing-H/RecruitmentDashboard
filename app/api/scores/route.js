@@ -28,7 +28,8 @@ export async function POST(request) {
     }
 
     // Validate score ranges (1-5 stars, 0 means not rated)
-    const scores = { confidence, dressing_sense, dedication, experience, preferred_vertical, priority };
+    // Note: preferred_vertical is now a text field, not a score
+    const scores = { confidence, dressing_sense, dedication, experience, priority };
     for (const [key, value] of Object.entries(scores)) {
       if (value !== null && value !== undefined && (value < 0 || value > 5)) {
         return NextResponse.json(
@@ -58,7 +59,7 @@ export async function POST(request) {
         dressing_sense: dressing_sense ? parseInt(dressing_sense) : null,
         dedication: dedication ? parseInt(dedication) : null,
         experience: experience ? parseInt(experience) : null,
-        preferred_vertical: preferred_vertical ? parseInt(preferred_vertical) : null,
+        preferred_vertical: preferred_vertical || null,
         priority: priority ? parseInt(priority) : null,
         interviewer,
         feedback: feedback || null

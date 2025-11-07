@@ -1,7 +1,8 @@
 
 'use client';
-
 import { useState, useEffect } from 'react';
+
+
 
 
 
@@ -37,6 +38,10 @@ export default function SearchPage() {
     priority: 0
   });
   const [feedback, setFeedback] = useState('');
+  
+  // Check if score already exists
+  const [hasAlreadyScored, setHasAlreadyScored] = useState(false);
+  const [checkingScore, setCheckingScore] = useState(false);
   
   // Text popup modal state
   const [showTextModal, setShowTextModal] = useState(false);
@@ -101,7 +106,7 @@ export default function SearchPage() {
   };
 
   // Open score modal
-  const openScoreModal = (candidate) => {
+  const openScoreModal = async (candidate) => {
     setSelectedCandidate(candidate);
     setScores({
       confidence: 0,
@@ -113,6 +118,36 @@ export default function SearchPage() {
     });
     setFeedback('');
     setShowScoreModal(true);
+    
+    // Check if interviewer has already scored this candidate
+    await checkIfAlreadyScored(candidate);
+  };
+  
+  // Check if the current interviewer has already scored this candidate
+  const checkIfAlreadyScored = async (candidate) => {
+    if (!user || !candidate) return;
+    
+    setCheckingScore(true);
+    try {
+      const candidateEmail = candidate.email || candidate.email_address || candidate.email_id;
+      const response = await fetch(`/api/scores?email=${encodeURIComponent(candidateEmail)}`);
+      const data = await response.json();
+      
+      if (data.success && data.data) {
+        // Check if current user (interviewer) has already scored this candidate
+        const existingScore = data.data.find(
+          score => score.interviewer === user.name || score.interviewer === user.email
+        );
+        setHasAlreadyScored(!!existingScore);
+      } else {
+        setHasAlreadyScored(false);
+      }
+    } catch (error) {
+      console.error('Error checking existing score:', error);
+      setHasAlreadyScored(false);
+    } finally {
+      setCheckingScore(false);
+    }
   };
 
   // Submit score
@@ -143,8 +178,7 @@ export default function SearchPage() {
       
       if (data.success) {
         alert('Score submitted successfully!');
-        setShowScoreModal(false);
-        setSelectedCandidate(null);
+        closeScoreModal();
       } else {
         alert('Failed to submit score: ' + data.error);
       }
@@ -152,6 +186,14 @@ export default function SearchPage() {
       alert('Error submitting score');
       console.error(error);
     }
+  };
+  
+  // Close score modal and reset states
+  const closeScoreModal = () => {
+    setShowScoreModal(false);
+    setSelectedCandidate(null);
+    setHasAlreadyScored(false);
+    setCheckingScore(false);
   };
 
   const handleLogout = () => {
@@ -1385,22 +1427,26 @@ export default function SearchPage() {
             <div style={{ display: 'flex', gap: '10px' }}>
               <button 
                 onClick={handleSubmitScore}
+                disabled={hasAlreadyScored || checkingScore}
                 style={{ 
                   flex: 1,
                   padding: '12px',
-                  background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  background: hasAlreadyScored 
+                    ? 'linear-gradient(135deg, #64748b 0%, #475569 100%)' 
+                    : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                   color: 'white',
                   border: 'none',
                   borderRadius: '6px',
-                  cursor: 'pointer',
+                  cursor: hasAlreadyScored ? 'not-allowed' : 'pointer',
                   fontSize: '16px',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  opacity: hasAlreadyScored ? 0.7 : 1
                 }}
               >
-                Submit Score
+                {checkingScore ? 'Checking...' : hasAlreadyScored ? 'Score Already Given' : 'Submit Score'}
               </button>
               <button 
-                onClick={() => setShowScoreModal(false)}
+                onClick={closeScoreModal}
                 style={{ 
                   flex: 1,
                   padding: '12px',
