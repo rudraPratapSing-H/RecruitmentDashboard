@@ -1,0 +1,235 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model candidates_content {
+  id                       Int      @id @default(autoincrement())
+  email_address            String   @db.VarChar(255)
+  name                     String   @db.VarChar(255)
+  contact_number           String?  @db.VarChar(20)
+  email_id                 String?  @db.VarChar(255)
+  branch                   String?  @db.VarChar(100)
+  section                  String?  @db.VarChar(10)
+  year                     String?  @db.VarChar(10)
+  vertical_1               String?  @db.VarChar(100)
+  linkedin_link            String?  @db.VarChar(255)
+  task_1_2_description     String?  @db.Text
+  task_1_2_submission_link String?  @db.VarChar(255)
+  task_3_description       String?  @db.Text
+  task_3_end_report_link   String?  @db.VarChar(255)
+  vertical_2               String?  @db.VarChar(100)
+  introduction             String?  @db.Text
+  resume_link              String?  @db.VarChar(255)
+  tech_stack               String?  @db.Text
+  hobbies                  String?  @db.Text
+  recruitment_pitch        String?  @db.Text
+  status                   Boolean?
+}
+
+model candidates_creatives {
+  id                   Int      @id @default(autoincrement())
+  email_address        String   @db.VarChar(255)
+  name                 String   @db.VarChar(255)
+  contact_number       String?  @db.VarChar(20)
+  email_id             String?  @db.VarChar(255)
+  branch               String?  @db.VarChar(100)
+  section              String?  @db.VarChar(10)
+  year                 String?  @db.VarChar(10)
+  vertical_1           String?  @db.VarChar(100)
+  linkedin_link        String?  @db.VarChar(255)
+  task_1_idea          String?  @db.Text
+  task_2_challenge     String?  @db.Text
+  idea_submission_link String?  @db.VarChar(255)
+  vertical_2           String?  @db.VarChar(100)
+  introduction         String?  @db.Text
+  resume_link          String?  @db.VarChar(255)
+  tech_stack           String?  @db.Text
+  hobbies              String?  @db.Text
+  recruitment_pitch    String?  @db.Text
+  status               Boolean?
+}
+
+model candidates_design {
+  id                     Int      @id @default(autoincrement())
+  submission_timestamp   String?  @db.Text
+  email_address          String   @db.VarChar(255)
+  name                   String   @db.VarChar(255)
+  contact_number         String?  @db.VarChar(20)
+  email_id               String?  @db.VarChar(255)
+  branch                 String?  @db.VarChar(100)
+  section                String?  @db.VarChar(10)
+  year                   String?  @db.VarChar(10)
+  vertical_1             String?  @db.VarChar(100)
+  linkedin_link          String?  @db.VarChar(255)
+  idea_story_1           String?  @db.Text
+  idea_story_2           String?  @db.Text
+  design_submission_link String?  @db.VarChar(500)
+  tools_used             String?  @db.Text
+  portfolio_link         String?  @db.VarChar(255)
+  vertical_2             String?  @db.VarChar(100)
+  introduction           String?  @db.Text
+  resume_link            String?  @db.VarChar(255)
+  tech_stack             String?  @db.Text
+  hobbies                String?  @db.Text
+  recruitment_pitch      String?  @db.Text
+  status                 Boolean?
+}
+
+model ppt_submissions {
+  id                     Int      @id @default(autoincrement())
+  team_name              String?  @db.VarChar(500)
+  idea_title             String?  @db.VarChar(1000)
+  solution_description   String?  @db.Text
+  presentation_file_path String?  @db.VarChar(2000)
+  problem_id             String?  @db.VarChar(1000)
+  status                 Boolean?
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model recruitment_round_2_2k25__responses____ops {
+  email_address             String? @db.Text
+  name                      String? @db.Text
+  contact_number            BigInt?
+  email_id                  BigInt?
+  branch                    BigInt?
+  section                   BigInt?
+  year                      String? @db.Text
+  vertical_1                String? @db.Text
+  linkedin_link             String? @db.Text
+  task_submission_ops       String? @db.Text
+  vertical_2                String? @db.Text
+  introduction              String? @db.Text
+  resume_link               BigInt?
+  tech_stack                BigInt?
+  hobbies                   String? @db.Text
+  Why_We_Should_Recruit_You String? @map("Why We Should Recruit You") @db.Text
+
+  @@map("recruitment_round_2_2k25 (responses) - ops")
+  @@ignore
+}
+
+model user {
+  id       Int    @id @default(autoincrement())
+  email    String @unique(map: "email") @db.VarChar(255)
+  name     String @db.VarChar(255)
+  password String @db.VarChar(255)
+}
+
+model interview_scores {
+  id                 Int      @id @default(autoincrement())
+  candidateName      String   @db.VarChar(255)
+  candidateEmail     String   @db.VarChar(255)
+  contactNumber      String?  @db.VarChar(20)
+  vertical           String?  @db.VarChar(100)
+  score              Int      @db.TinyInt
+  interviewer        String   @db.VarChar(255)
+  feedback           String?  @db.Text
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  confidence         Int?
+  dressing_sense     Int?
+  dedication         Int?
+  experience         Int?
+  preferred_vertical String?  @db.VarChar(100)
+  priority           Int?
+
+  @@index([candidateEmail])
+  @@index([interviewer])
+}
+
+model recruitment_submissions {
+  id                      Int     @id @default(autoincrement())
+  timestamp               String? @db.VarChar(100)
+  panel_number            String? @db.VarChar(100)
+  shift                   String? @db.VarChar(100)
+  no_use_email            String? @db.VarChar(100)
+  name                    String? @db.VarChar(255)
+  contact_number          String? @db.VarChar(20)
+  email_id                String? @db.VarChar(255)
+  branch                  String? @db.VarChar(100)
+  section                 String? @db.VarChar(10)
+  year                    String? @db.VarChar(10)
+  vertical_1              String? @db.VarChar(255)
+  linkedin_id             String? @db.VarChar(255)
+  task_desc_1_2           String? @db.Text
+  task_upload_1_2         String? @db.VarChar(255)
+  task_desc_3             String? @db.Text
+  content_task_report     String? @db.VarChar(255)
+  vertical_2              String? @db.VarChar(255)
+  task_desc_1_2_2         String? @db.Text
+  task_upload_1_2_2       String? @db.VarChar(255)
+  task_desc_3_2           String? @db.Text
+  content_task_report_2   String? @db.VarChar(255)
+  task_mgmt_1             String? @db.Text
+  task_upload_1           String? @db.VarChar(255)
+  task_mgmt_2             String? @db.Text
+  task_upload_2           String? @db.Text
+  vertical_2_2            String? @db.Text
+  task_mgmt_1_2           String? @db.Text
+  task_upload_1_2_2_again String? @db.VarChar(255)
+  task_mgmt_2_2           String? @db.Text
+  task_upload_2_2         String? @db.VarChar(255)
+  story_idea_1            String? @db.Text
+  story_idea_2            String? @db.Text
+  design_submission       String? @db.VarChar(255)
+  tools_used              String? @db.VarChar(255)
+  portfolio_link          String? @db.VarChar(255)
+  vertical_2_3            String? @db.VarChar(255)
+  story_idea_1_2          String? @db.Text
+  story_idea_2_2          String? @db.Text
+  design_submission_2     String? @db.VarChar(2550)
+  tools_used_2            String? @db.VarChar(255)
+  portfolio_link_2        String? @db.VarChar(255)
+  task_explanation        String? @db.Text
+  task_submission         String? @db.VarChar(255)
+  tools_used_3            String? @db.VarChar(255)
+  portfolio_link_3        String? @db.VarChar(255)
+  vertical_2_4            String? @db.VarChar(255)
+  task_explanation_2      String? @db.Text
+  task_submission_2       String? @db.VarChar(255)
+  tools_used_4            String? @db.VarChar(255)
+  portfolio_link_4        String? @db.VarChar(255)
+  pr_task_explanation     String? @db.Text
+  task_submission_3       String? @db.VarChar(255)
+  vertical_2_5            String? @db.VarChar(255)
+  pr_task_explanation_2   String? @db.Text
+  task_submission_4       String? @db.VarChar(255)
+  strategy_scenario       String? @db.Text
+  strategy_procedure      String? @db.Text
+  strategy_upload         String? @db.VarChar(255)
+  vertical_2_6            String? @db.VarChar(255)
+  strategy_scenario_2     String? @db.Text
+  strategy_procedure_2    String? @db.Text
+  strategy_upload_2       String? @db.VarChar(255)
+  ops_submission          String? @db.VarChar(255)
+  vertical_2_7            String? @db.VarChar(255)
+  ops_submission_2        String? @db.VarChar(255)
+  ops_task_1_idea         String? @db.Text
+  ops_task_2_challenge    String? @db.Text
+  ops_idea_upload         String? @db.VarChar(255)
+  vertical_2_8            String? @db.VarChar(255)
+  ops_task_1_idea_2       String? @db.Text
+  ops_task_2_challenge_2  String? @db.Text
+  ops_idea_upload_2       String? @db.VarChar(255)
+  tech_experience         String? @db.Text
+  tech_stack              String? @db.Text
+  tech_showcase           String? @db.VarChar(255)
+  vertical_2_9            String? @db.VarChar(255)
+  tech_experience_2       String? @db.Text
+  tech_stack_2            String? @db.Text
+  tech_showcase_2         String? @db.VarChar(2505)
+  introduction            String? @db.Text
+  resume_link             String? @db.VarChar(255)
+  tech_stack_3            String? @db.Text
+  hobbies                 String? @db.Text
+  recruitment_pitch       String? @db.Text
+  something               String? @db.Text
+
+  @@map("recruitment_submissions")
+
+}
