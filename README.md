@@ -29,9 +29,9 @@ graph TD
     Client -.-> Admin
     
     subgraph API Endpoints
-    APILogin[/api/login]
-    APISearch[/api/search]
-    APIScores[/api/scores]
+    APILogin["/api/login"]
+    APISearch["/api/search"]
+    APIScores["/api/scores"]
     end
     
     API -.-> APILogin
@@ -49,7 +49,7 @@ graph TD
 
 ### 1. Prerequisites
 
-- Node.js (v20 or higher)
+- Node.js (v24 LTS or higher)
 - A MySQL or PostgreSQL database
 
 ### 2. Installation
