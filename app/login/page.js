@@ -5,8 +5,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('leonrudy1403@gmail.com');
+  const [password, setPassword] = useState('2005');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -72,8 +72,11 @@ export default function LoginPage() {
           }}>
             Interview Portal
           </h1>
-          <p style={{ color: '#94a3b8', fontSize: '14px' }}>
+          <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '8px' }}>
             Sign in to access the platform
+          </p>
+          <p style={{ color: '#fbbf24', fontSize: '13px', fontWeight: '500' }}>
+            Recruiters please use the demo account
           </p>
         </div>
         
