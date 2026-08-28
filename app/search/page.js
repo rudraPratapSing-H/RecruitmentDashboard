@@ -1125,6 +1125,47 @@ export default function SearchPage() {
         </div>
       </div>
 
+      {/* Instruction Banner */}
+      <div style={{
+        marginBottom: '20px',
+        padding: '16px 24px',
+        background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+        borderRadius: '10px',
+        border: '1px solid rgba(102, 126, 234, 0.25)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '14px'
+      }}>
+        <span style={{ fontSize: '28px', flexShrink: 0 }}>💡</span>
+        <div>
+          <p style={{
+            margin: '0 0 4px 0',
+            fontSize: '16px',
+            fontWeight: '700',
+            color: '#e2e8f0',
+            letterSpacing: '0.3px'
+          }}>
+            How to Search
+          </p>
+          <p style={{
+            margin: 0,
+            fontSize: '14px',
+            color: '#94a3b8',
+            lineHeight: '1.5'
+          }}>
+            Type a <strong style={{ color: '#a78bfa' }}>team name</strong> in the left box or a <strong style={{ color: '#34d399' }}>candidate name</strong> in the right box and click <strong style={{ color: '#e2e8f0' }}>Search</strong> or press <kbd style={{
+              padding: '2px 8px',
+              backgroundColor: '#334155',
+              borderRadius: '4px',
+              border: '1px solid #475569',
+              fontSize: '12px',
+              color: '#e2e8f0',
+              fontFamily: 'monospace'
+            }}>Enter</kbd> to find results.
+          </p>
+        </div>
+      </div>
+
       {/* Search Section */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '30px' }}>
         {/* Team Search */}
